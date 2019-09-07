@@ -1,8 +1,8 @@
 ﻿TIE Sound Editor
 ===============================================================================
 Author: Michael Gaisser (mjgaisser@gmail.com)
-Version 1.1
-Date: 2009.09.18
+Version 1.2
+Date: 2019.09.07
 ===============================================================================
 
 This editor reads and writes the WAV files within the VOIC and BLAS resource
@@ -10,6 +10,9 @@ types found in TIE95 LFD files.
 
 ===================
 VERSION HISTORY
+
+v1.2 - 07 Sep 2019
+ - Rebuilt using current LfdReader library, fixes a crash with VOIC resources
 
 v1.1.1 - 29 Jul 2015
  - Released under MPL 2.0

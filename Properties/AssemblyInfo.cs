@@ -1,10 +1,10 @@
 ﻿/*
  * TieSoundEditor.exe, Editor for BLAS and VOIC resources in LFD files
- * Copyright (C) 2007 Michael Gaisser (mjgaisser@gmail.com)
+ * Copyright (C) 2007-2019 Michael Gaisser (mjgaisser@gmail.com)
  * Licensed under the MPL v2.0 or later.
  * 
  * Full notice in Program.cs
- * Version: 1.1.1
+ * Version: 1.2
  */
 
 using System.Reflection;
@@ -17,7 +17,7 @@ using System.Reflection;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Imperial Department of Military Research")]
 [assembly: AssemblyProduct("TSE")]
-[assembly: AssemblyCopyright("Copyright © 2007 Michael Gaisser")]
+[assembly: AssemblyCopyright("Copyright © 2007-2019 Michael Gaisser")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]		
 
@@ -31,6 +31,6 @@ using System.Reflection;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.1.1")]
-[assembly: AssemblyFileVersion("1.1.1.0")]
-[assembly: AssemblyInformationalVersion("1.1 Final")]
+[assembly: AssemblyVersion("1.2.*")]
+[assembly: AssemblyFileVersion("1.2.*")]
+[assembly: AssemblyInformationalVersion("1.2 Final")]

@@ -53,11 +53,11 @@ namespace Idmr.TieSoundEditor
 			//SND_RESOURCE = 0x00040004  // name is resource name or atom 
 		}
 
-		private void cmdLFD_Click(object sender, System.EventArgs e)
+		private void cmdLFD_Click(object sender, EventArgs e)
 		{
 			opnFile.ShowDialog();	// yes, I'm aware I'm using opn even for the WAVtoLFD
 		}
-		private void cmdWave_Click(object sender, System.EventArgs e)
+		private void cmdWave_Click(object sender, EventArgs e)
 		{
 			savFile.FileName = lstVOIC.SelectedItem.ToString();
 			savFile.ShowDialog();	// yes, I'm aware I'm using sav even for the WAVtoLFD
@@ -88,7 +88,7 @@ namespace Idmr.TieSoundEditor
 					_lfd.Resources[i].Tag = lstVOIC.Items.Add(_lfd.Rmap.SubHeaders[i].Name);		// if valid source, add it to the lst
 				}
 		}
-		private void lstVOIC_SelectedIndexChanged(object sender, System.EventArgs e)
+		private void lstVOIC_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			txtWave.Enabled = true;
 			cmdWave.Enabled = true;
@@ -96,7 +96,7 @@ namespace Idmr.TieSoundEditor
 			cmdSave.Enabled = true;
 			// play sound from memory as index changes for preview
 			MemoryStream mem = new MemoryStream();
-			VOCtoWAV(mem);
+			vocToWav(mem);
 			byte[] soundBytes = new byte[mem.Length];
 			mem.Position = 0;
 			mem.Read(soundBytes, 0, (int)mem.Length);	//read it back into an array
@@ -108,7 +108,7 @@ namespace Idmr.TieSoundEditor
 			cmdSave.Enabled = true;
 			txtWave.Text = savFile.FileName;
 		}
-		private void cmdSave_Click(object sender, System.EventArgs e)
+		private void cmdSave_Click(object sender, EventArgs e)
 		{
 			if (optExport.Checked)
 			{
@@ -117,7 +117,7 @@ namespace Idmr.TieSoundEditor
 				{
 					stream = File.OpenWrite(txtWave.Text);
 					stream.SetLength(1);	//resets file in case of overwrite
-					VOCtoWAV(stream);
+					vocToWav(stream);
 					stream.Close();
 				}
 				catch (Exception x)
@@ -133,13 +133,13 @@ namespace Idmr.TieSoundEditor
 				{
 					string s_name = Path.GetFileNameWithoutExtension(txtWave.Text);
 					if (lstVOIC.Items.IndexOf(s_name) == -1) throw new Exception("WAV file name must match an existing VOIC/BLAS to overwrite");
-					WAVtoVOC(lstVOIC.Items.IndexOf(s_name));
+					wavToVoc(lstVOIC.Items.IndexOf(s_name));
 				}
 				catch (Exception x) { MessageBox.Show(x.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
 			}
 		}
 
-		private void VOCtoWAV(Stream s)
+		private void vocToWav(Stream s)
 		{
 			BinaryWriter bw = new BinaryWriter(s);
 			Blas blas = _currentBlas;
@@ -173,7 +173,7 @@ namespace Idmr.TieSoundEditor
 			s.Position = 40;
 			bw.Write((uint)(s.Length-44));
 		}
-		private void WAVtoVOC(int index)
+		private void wavToVoc(int index)
 		{
 			/// okay, here's what I'm going to allow:
 			/// 10-12 kHz , mono, 8bit sample size, uncompressed, single data chunk, filename must match VOIC name
@@ -239,7 +239,7 @@ namespace Idmr.TieSoundEditor
 			_lfd.Write();
 		}
 
-		private void optExport_CheckedChanged(object sender, System.EventArgs e)
+		private void optExport_CheckedChanged(object sender, EventArgs e)
 		{
 			if (optExport.Checked)
 			{
@@ -252,7 +252,7 @@ namespace Idmr.TieSoundEditor
 				label3.Text = "Wave file to load (must match VOIC/BLAS name)";
 			}
 		}
-		private void cmdExit_Click(object sender, System.EventArgs e)
+		private void cmdExit_Click(object sender, EventArgs e)
 		{
 			Application.Exit();
 		}

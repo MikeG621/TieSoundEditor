@@ -55,6 +55,13 @@
 			this.cmdSave = new System.Windows.Forms.Button();
 			this.cmdExit = new System.Windows.Forms.Button();
 			this.cmdDump = new System.Windows.Forms.Button();
+			this.label4 = new System.Windows.Forms.Label();
+			this.lblFreq = new System.Windows.Forms.Label();
+			this.lblDuration0 = new System.Windows.Forms.Label();
+			this.lblRepeat0 = new System.Windows.Forms.Label();
+			this.lblSdb1 = new System.Windows.Forms.Label();
+			this.lblDuration1 = new System.Windows.Forms.Label();
+			this.lblRepeat1 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -187,10 +194,80 @@
 			this.cmdDump.UseVisualStyleBackColor = true;
 			this.cmdDump.Click += new System.EventHandler(this.cmdDump_Click);
 			// 
+			// label4
+			// 
+			this.label4.AutoSize = true;
+			this.label4.Location = new System.Drawing.Point(438, 77);
+			this.label4.Name = "label4";
+			this.label4.Size = new System.Drawing.Size(77, 13);
+			this.label4.TabIndex = 14;
+			this.label4.Text = "Sound Block 1";
+			// 
+			// lblFreq
+			// 
+			this.lblFreq.AutoSize = true;
+			this.lblFreq.Location = new System.Drawing.Point(438, 64);
+			this.lblFreq.Name = "lblFreq";
+			this.lblFreq.Size = new System.Drawing.Size(31, 13);
+			this.lblFreq.TabIndex = 14;
+			this.lblFreq.Text = "Freq:";
+			// 
+			// lblDuration0
+			// 
+			this.lblDuration0.AutoSize = true;
+			this.lblDuration0.Location = new System.Drawing.Point(450, 90);
+			this.lblDuration0.Name = "lblDuration0";
+			this.lblDuration0.Size = new System.Drawing.Size(50, 13);
+			this.lblDuration0.TabIndex = 14;
+			this.lblDuration0.Text = "Duration:";
+			// 
+			// lblRepeat0
+			// 
+			this.lblRepeat0.AutoSize = true;
+			this.lblRepeat0.Location = new System.Drawing.Point(450, 103);
+			this.lblRepeat0.Name = "lblRepeat0";
+			this.lblRepeat0.Size = new System.Drawing.Size(50, 13);
+			this.lblRepeat0.TabIndex = 14;
+			this.lblRepeat0.Text = "Repeats:";
+			// 
+			// lblSdb1
+			// 
+			this.lblSdb1.AutoSize = true;
+			this.lblSdb1.Location = new System.Drawing.Point(438, 120);
+			this.lblSdb1.Name = "lblSdb1";
+			this.lblSdb1.Size = new System.Drawing.Size(77, 13);
+			this.lblSdb1.TabIndex = 14;
+			this.lblSdb1.Text = "Sound Block 2";
+			// 
+			// lblDuration1
+			// 
+			this.lblDuration1.AutoSize = true;
+			this.lblDuration1.Location = new System.Drawing.Point(450, 133);
+			this.lblDuration1.Name = "lblDuration1";
+			this.lblDuration1.Size = new System.Drawing.Size(50, 13);
+			this.lblDuration1.TabIndex = 14;
+			this.lblDuration1.Text = "Duration:";
+			// 
+			// lblRepeat1
+			// 
+			this.lblRepeat1.AutoSize = true;
+			this.lblRepeat1.Location = new System.Drawing.Point(450, 146);
+			this.lblRepeat1.Name = "lblRepeat1";
+			this.lblRepeat1.Size = new System.Drawing.Size(50, 13);
+			this.lblRepeat1.TabIndex = 14;
+			this.lblRepeat1.Text = "Repeats:";
+			// 
 			// frmTSE
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.ClientSize = new System.Drawing.Size(480, 269);
+			this.ClientSize = new System.Drawing.Size(557, 269);
+			this.Controls.Add(this.lblRepeat1);
+			this.Controls.Add(this.lblRepeat0);
+			this.Controls.Add(this.lblDuration1);
+			this.Controls.Add(this.lblDuration0);
+			this.Controls.Add(this.lblFreq);
+			this.Controls.Add(this.lblSdb1);
+			this.Controls.Add(this.label4);
 			this.Controls.Add(this.cmdDump);
 			this.Controls.Add(this.cmdExit);
 			this.Controls.Add(this.cmdWave);
@@ -215,6 +292,13 @@
 		#endregion
 
 		private System.Windows.Forms.Button cmdDump;
+		private System.Windows.Forms.Label label4;
+		private System.Windows.Forms.Label lblFreq;
+		private System.Windows.Forms.Label lblDuration0;
+		private System.Windows.Forms.Label lblRepeat0;
+		private System.Windows.Forms.Label lblSdb1;
+		private System.Windows.Forms.Label lblDuration1;
+		private System.Windows.Forms.Label lblRepeat1;
 	}
 }
 

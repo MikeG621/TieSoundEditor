@@ -4,10 +4,12 @@
  * Licensed under the MPL v2.0 or later.
  * 
  * Full notice in Program.cs
- * Version: 1.1.1
+ * Version: 1.1.1+
  */
 
 /* CHANGELOG
+ * [ADD] Sound details
+ * 
  * v1.1.1, 150729
  * - Released under MPL 2.0
  * 
@@ -102,6 +104,17 @@ namespace Idmr.TieSoundEditor
 			mem.Read(soundBytes, 0, (int)mem.Length);	//read it back into an array
 			PlaySound(soundBytes, IntPtr.Zero, SoundFlags.SND_MEMORY | SoundFlags.SND_ASYNC);
 			mem.Close();
+
+			Blas blas = _currentBlas;
+			lblFreq.Text = "Freq (Hz): " + blas.Frequency;
+			lblDuration0.Text = "Duration: " + Math.Round((decimal)blas.SoundBlocks[0].Data.Length / blas.Frequency, 2) + (blas.SoundBlocks[0].NumberOfRepeats > -1 ? " (x" + blas.SoundBlocks[0].NumberOfRepeats + ")" : "");
+			lblRepeat0.Text = "Repeats: " + blas.SoundBlocks[0].NumberOfRepeats;
+			if (blas.SoundBlocks[1].Data != null)
+			{
+				lblDuration1.Text = "Duration: " + Math.Round((decimal)blas.SoundBlocks[1].Data.Length / blas.Frequency, 2).ToString() + (blas.SoundBlocks[1].NumberOfRepeats > -1 ? " (x" + blas.SoundBlocks[1].NumberOfRepeats + ")" : "");
+				lblRepeat1.Text = "Repeats: " + blas.SoundBlocks[1].NumberOfRepeats.ToString();
+			}
+			lblSdb1.Visible = lblDuration1.Visible = lblRepeat1.Visible = blas.SoundBlocks[1].Data != null;
 		}
 		private void savFile_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
 		{

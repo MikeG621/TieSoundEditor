@@ -31,7 +31,7 @@ namespace Idmr.TieSoundEditor
 		{
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			Application.Run(new frmTSE());
+			Application.Run(new MainForm());
 		}
 	}
 }

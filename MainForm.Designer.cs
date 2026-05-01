@@ -1,6 +1,6 @@
 ﻿namespace Idmr.TieSoundEditor
 {
-	partial class frmTSE
+	partial class MainForm
 	{
 		private System.ComponentModel.IContainer components = null;
 		private System.Windows.Forms.Label label1;
@@ -39,7 +39,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmTSE));
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
 			this.label1 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();

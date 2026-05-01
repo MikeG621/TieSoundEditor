@@ -27,11 +27,11 @@ using Idmr.LfdReader;
 
 namespace Idmr.TieSoundEditor
 {
-	public partial class frmTSE : Form
+	public partial class MainForm : Form
 	{
 		LfdFile _lfd;
 
-		public frmTSE()
+		public MainForm()
 		{
 			InitializeComponent();
 		}
@@ -55,10 +55,7 @@ namespace Idmr.TieSoundEditor
 			//SND_RESOURCE = 0x00040004  // name is resource name or atom 
 		}
 
-		private void cmdLFD_Click(object sender, EventArgs e)
-		{
-			opnFile.ShowDialog();	// yes, I'm aware I'm using opn even for the WAVtoLFD
-		}
+		private void cmdLFD_Click(object sender, EventArgs e) => opnFile.ShowDialog();  // yes, I'm aware I'm using opn even for the WAVtoLFD
 		private void cmdWave_Click(object sender, EventArgs e)
 		{
 			savFile.FileName = lstVOIC.SelectedItem.ToString();
@@ -86,9 +83,7 @@ namespace Idmr.TieSoundEditor
 
 			for (int i = 0; i < _lfd.Rmap.NumberOfHeaders; i++)
 				if (_lfd.Rmap.SubHeaders[i].Type == Resource.ResourceType.Voic || _lfd.Rmap.SubHeaders[i].Type == Resource.ResourceType.Blas)
-				{
 					_lfd.Resources[i].Tag = lstVOIC.Items.Add(_lfd.Rmap.SubHeaders[i].Name);		// if valid source, add it to the lst
-				}
 		}
 		private void lstVOIC_SelectedIndexChanged(object sender, EventArgs e)
 		{
@@ -107,11 +102,11 @@ namespace Idmr.TieSoundEditor
 
 			Blas blas = _currentBlas;
 			lblFreq.Text = "Freq (Hz): " + blas.Frequency;
-			lblDuration0.Text = "Duration: " + Math.Round((decimal)blas.SoundBlocks[0].Data.Length / blas.Frequency, 2) + (blas.SoundBlocks[0].NumberOfRepeats > -1 ? " (x" + blas.SoundBlocks[0].NumberOfRepeats + ")" : "");
+			lblDuration0.Text = $"Duration: {Math.Round((decimal)blas.SoundBlocks[0].Data.Length / blas.Frequency, 2)}" + (blas.SoundBlocks[0].NumberOfRepeats > -1 ? $" (x{blas.SoundBlocks[0].NumberOfRepeats})" : "");
 			lblRepeat0.Text = "Repeats: " + blas.SoundBlocks[0].NumberOfRepeats;
 			if (blas.SoundBlocks[1].Data != null)
 			{
-				lblDuration1.Text = "Duration: " + Math.Round((decimal)blas.SoundBlocks[1].Data.Length / blas.Frequency, 2).ToString() + (blas.SoundBlocks[1].NumberOfRepeats > -1 ? " (x" + blas.SoundBlocks[1].NumberOfRepeats + ")" : "");
+				lblDuration1.Text = $"Duration: {Math.Round((decimal)blas.SoundBlocks[1].Data.Length / blas.Frequency, 2)}" + (blas.SoundBlocks[1].NumberOfRepeats > -1 ? $" (x{blas.SoundBlocks[1].NumberOfRepeats})" : "");
 				lblRepeat1.Text = "Repeats: " + blas.SoundBlocks[1].NumberOfRepeats.ToString();
 			}
 			lblSdb1.Visible = lblDuration1.Visible = lblRepeat1.Visible = blas.SoundBlocks[1].Data != null;
@@ -144,9 +139,9 @@ namespace Idmr.TieSoundEditor
 			{
 				try
 				{
-					string s_name = Path.GetFileNameWithoutExtension(txtWave.Text);
-					if (lstVOIC.Items.IndexOf(s_name) == -1) throw new Exception("WAV file name must match an existing VOIC/BLAS to overwrite");
-					wavToVoc(lstVOIC.Items.IndexOf(s_name));
+					string name = Path.GetFileNameWithoutExtension(txtWave.Text);
+					if (lstVOIC.Items.IndexOf(name) == -1) throw new Exception("WAV file name must match an existing VOIC/BLAS to overwrite");
+					wavToVoc(lstVOIC.Items.IndexOf(name));
 				}
 				catch (Exception x) { MessageBox.Show(x.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
 			}
@@ -200,7 +195,7 @@ namespace Idmr.TieSoundEditor
 			if (new string(br.ReadChars(4)) != "RIFF") throw new Exception("Invalid file type");
 			stream.Position += 4;
 			if (new string(br.ReadChars(4)) != "WAVE") throw new Exception("Invalid file type");
-			// find the right chunks, since they can technically be *anywhere* in the file (fucking non-standard filetype)
+			// find the right chunks, since they can technically be *anywhere* in the file
 			for (;;)
 			{
 				if (new string(br.ReadChars(4)) == "fmt ")
@@ -265,10 +260,7 @@ namespace Idmr.TieSoundEditor
 				label3.Text = "Wave file to load (must match VOIC/BLAS name)";
 			}
 		}
-		private void cmdExit_Click(object sender, EventArgs e)
-		{
-			Application.Exit();
-		}
+		private void cmdExit_Click(object sender, EventArgs e) => Application.Exit();
 
 		private void cmdDump_Click(object sender, EventArgs e)
 		{

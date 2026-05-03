@@ -198,22 +198,32 @@ namespace Idmr.TieSoundEditor
 			// find the right chunks, since they can technically be *anywhere* in the file
 			for (;;)
 			{
-				if (new string(br.ReadChars(4)) == "fmt ")
+				long pos = stream.Position;
+				try
 				{
-					pos_fmt = stream.Position - 4;
-					break;
+					if (new string(br.ReadChars(4)) == "fmt ")
+					{
+						pos_fmt = stream.Position - 4;
+						break;
+					}
 				}
+				catch { stream.Position = pos + 4; }
 				if ((stream.Position + 10) == stream.Length) throw new Exception("fmt chunk missing, invalid WAV file");
 				stream.Position -= 3;
 			}
 			stream.Position = 12;
 			for (;;)
 			{
-				if (new string(br.ReadChars(4)) == "data")
+				long pos = stream.Position;
+				try
 				{
-					pos_data = stream.Position - 4;
-					break;
+					if (new string(br.ReadChars(4)) == "data")
+					{
+						pos_data = stream.Position - 4;
+						break;
+					}
 				}
+				catch { stream.Position = pos + 4; }
 				if ((stream.Position + 4) == stream.Length) throw new Exception("data chunk missing, invalid WAV file");
 				stream.Position -= 3;
 			}

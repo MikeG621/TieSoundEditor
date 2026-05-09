@@ -9,6 +9,8 @@
 
 /* CHANGELOG
  * [ADD] Sound details
+ * [FIX] text I/O replaced with ints
+ * [UPD] WAV decode used from LfdReader
  * 
  * v1.1.1, 150729
  * - Released under MPL 2.0
@@ -149,37 +151,8 @@ namespace Idmr.TieSoundEditor
 
 		private void vocToWav(Stream s)
 		{
-			BinaryWriter bw = new BinaryWriter(s);
-			Blas blas = _currentBlas;
-			// WAV_HEADER
-			bw.Write("RIFF".ToCharArray());
-			s.Position += 4;				// skip over, come back to later, P = 4  (file.length-8)
-			bw.Write("WAVE".ToCharArray());
-			// WAV_DATA_BLOCK
-			// fmt_HEADER
-			bw.Write("fmt ".ToCharArray());
-			bw.Write((uint)16);				// fmt block length
-			// fmt_DATA_BLOCK
-			bw.Write((short)1);				// uncompressed PCM
-			bw.Write((short)1);				// NumChannels (Mono)
-			bw.Write((uint)blas.Frequency);			// SampleRate
-			bw.Write((uint)blas.Frequency);			// ByteRate (SampleRate * NumChannels * BitsPerSample/8) [SR * 1 * 8/8]
-			bw.Write((short)1);				// BlockAlign (NumChannels * BitsPerSample/8) [1 * 8/8]
-			bw.Write((short)8);				// BitsPerSample
-			// data_HEADER
-			bw.Write("data".ToCharArray());
-			s.Position += 4;				// skip over, come back to later, P = 40 (file.length-44);
-			foreach (Blas.SoundDataBlock sdb in blas.SoundBlocks)
-				if (sdb.Data != null)
-					if (sdb.DoesRepeat)
-						for (int i = 0; i < (sdb.NumberOfRepeats != -1 ? sdb.NumberOfRepeats + 1 : 4); i++)	// repeat 4 times for infinite repeats
-							bw.Write(sdb.Data);
-					else bw.Write(sdb.Data);
-			s.SetLength(s.Position);
-			s.Position = 4;
-			bw.Write((uint)(s.Length-8));
-			s.Position = 40;
-			bw.Write((uint)(s.Length-44));
+			var bytes = _currentBlas.GetWavBytes();
+			s.Write(bytes, 0, bytes.Length);
 		}
 		private void wavToVoc(int index)
 		{
@@ -192,38 +165,28 @@ namespace Idmr.TieSoundEditor
 			stream.Position = 0;
 			// going to start with just ensuring the format is right
 			#region validation
-			if (new string(br.ReadChars(4)) != "RIFF") throw new Exception("Invalid file type");
+			if (br.ReadInt32() != 0x46464952 /* "RIFF" */) throw new Exception("Invalid file type");
 			stream.Position += 4;
-			if (new string(br.ReadChars(4)) != "WAVE") throw new Exception("Invalid file type");
+			if (br.ReadInt32() != 0x45564157 /* "WAVE" */) throw new Exception("Invalid file type");
 			// find the right chunks, since they can technically be *anywhere* in the file
 			for (;;)
 			{
-				long pos = stream.Position;
-				try
+				if (br.ReadInt32() == 0x20746D66) // "fmt "
 				{
-					if (new string(br.ReadChars(4)) == "fmt ")
-					{
-						pos_fmt = stream.Position - 4;
-						break;
-					}
+					pos_fmt = stream.Position - 4;
+					break;
 				}
-				catch { stream.Position = pos + 4; }
 				if ((stream.Position + 10) == stream.Length) throw new Exception("fmt chunk missing, invalid WAV file");
 				stream.Position -= 3;
 			}
 			stream.Position = 12;
 			for (;;)
 			{
-				long pos = stream.Position;
-				try
+				if (br.ReadInt32() == 0x61746164) // "data"
 				{
-					if (new string(br.ReadChars(4)) == "data")
-					{
-						pos_data = stream.Position - 4;
-						break;
-					}
+					pos_data = stream.Position - 4;
+					break;
 				}
-				catch { stream.Position = pos + 4; }
 				if ((stream.Position + 4) == stream.Length) throw new Exception("data chunk missing, invalid WAV file");
 				stream.Position -= 3;
 			}

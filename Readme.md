@@ -9,16 +9,13 @@ This editor reads and writes the WAV files within the VOIC and BLAS resource
 types found in TIE95 LFD files.
 
 ## Latest Release
-
-#### WIP
-- Sound properties for the selected resource is now shown.
-
-#### v1.2 - 07 Sep 2019
-- Rebuilt using current LfdReader library, fixes a crash with VOIC resources
+#### v1.3 - 10 May 2026
+- Sound properties for the selected resource are now shown.
+- Text I/O in WAV headers have been replaced with int32 comparisons to mitigate Unicode issues [[Issue #1](https://github.com/MikeG621/TieSoundEditor/issues/1)].
+- WAV decode now uses the function in LfdReader.
 
 ---
 ### Additional Information
-
 #### Dependencies
 - [Idmr.Common](https://github.com/MikeG621/Common)
 - [Idmr.LfdReader](https://github.com/MikeG621/LfdReader)
@@ -26,7 +23,7 @@ types found in TIE95 LFD files.
 #### WAV Guidelines
 
 Filenames for WAV to be imported must match the name of the resource they are
-replacing as shown in the list.  This is to orevent accidental overwrites.
+replacing as shown in the list.  This is to prevent accidental overwrites.
 
 Exported WAV files will be 8-bit mono, 11,025 Hz.
 
@@ -48,14 +45,17 @@ As always, backup your original files first.
 
 ---
 ### Version History
+#### v1.2 - 07 Sep 2019
+- Rebuilt using current LfdReader library, fixes a crash with VOIC resources
+
 #### v1.1.1 - 29 Jul 2015
- - Released under MPL 2.0
+- Released under MPL 2.0
 
 #### v1.1 - 18 Sep 2009
- - Updates to WAV processing
+- Updates to WAV processing
 
 #### v1.0 - 15 Dec 2007
- - Release
+- Release
 
 ---
 #### Copyright Information

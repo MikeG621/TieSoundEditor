@@ -1,15 +1,16 @@
 ﻿/*
  * TieSoundEditor.exe, Editor for BLAS and VOIC resources in LFD files
- * Copyright (C) 2007 Michael Gaisser (mjgaisser@gmail.com)
+ * Copyright (C) 2007-2026 Michael Gaisser (mjgaisser@gmail.com)
  * Licensed under the MPL v2.0 or later.
  * 
  * Full notice in Program.cs
- * Version: 1.1.1+
+ * Version: 1.3
  */
 
 /* CHANGELOG
+ * v1.3, 260510
  * [ADD] Sound details
- * [FIX] text I/O replaced with ints
+ * [FIX #1] text I/O replaced with ints to mitgate Unicode issues
  * [UPD] WAV decode used from LfdReader
  * 
  * v1.1.1, 150729
@@ -57,12 +58,80 @@ namespace Idmr.TieSoundEditor
 			//SND_RESOURCE = 0x00040004  // name is resource name or atom 
 		}
 
+		#region controls
+		private void cmdDump_Click(object sender, EventArgs e)
+		{
+			Blas blas = _currentBlas;
+			FileStream dump = File.OpenWrite(_lfd.FilePath + "_dump.txt");
+			new BinaryWriter(dump).Write(blas.RawData);
+			dump.SetLength(dump.Position);
+			dump.Close();
+		}
+		private void cmdExit_Click(object sender, EventArgs e) => Application.Exit();
 		private void cmdLFD_Click(object sender, EventArgs e) => opnFile.ShowDialog();  // yes, I'm aware I'm using opn even for the WAVtoLFD
+		private void cmdSave_Click(object sender, EventArgs e)
+		{
+			if (optExport.Checked)
+			{
+				FileStream stream = null;
+				try
+				{
+					stream = File.OpenWrite(txtWave.Text);
+					stream.SetLength(1);    //resets file in case of overwrite
+					vocToWav(stream);
+					stream.Close();
+				}
+				catch (Exception x)
+				{
+					MessageBox.Show(x.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					stream.Close();
+					return;
+				}
+			}
+			else
+			{
+				try
+				{
+					string name = Path.GetFileNameWithoutExtension(txtWave.Text);
+					if (lstVOIC.Items.IndexOf(name) == -1) throw new Exception("WAV file name must match an existing VOIC/BLAS to overwrite");
+					wavToVoc(lstVOIC.Items.IndexOf(name));
+				}
+				catch (Exception x) { MessageBox.Show(x.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+			}
+		}
 		private void cmdWave_Click(object sender, EventArgs e)
 		{
 			savFile.FileName = lstVOIC.SelectedItem.ToString();
 			savFile.ShowDialog();	// yes, I'm aware I'm using sav even for the WAVtoLFD
 		}
+
+		private void lstVOIC_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			txtWave.Enabled = true;
+			cmdWave.Enabled = true;
+			txtWave.Text = Directory.GetCurrentDirectory() + "\\" + lstVOIC.SelectedItem.ToString() + ".wav";
+			cmdSave.Enabled = true;
+			// play sound from memory as index changes for preview
+			MemoryStream mem = new MemoryStream();
+			vocToWav(mem);
+			byte[] soundBytes = new byte[mem.Length];
+			mem.Position = 0;
+			mem.Read(soundBytes, 0, (int)mem.Length);   //read it back into an array
+			PlaySound(soundBytes, IntPtr.Zero, SoundFlags.SND_MEMORY | SoundFlags.SND_ASYNC);
+			mem.Close();
+
+			Blas blas = _currentBlas;
+			lblFreq.Text = "Freq (Hz): " + blas.Frequency;
+			lblDuration0.Text = $"Duration: {Math.Round((decimal)blas.SoundBlocks[0].Data.Length / blas.Frequency, 2)}" + (blas.SoundBlocks[0].NumberOfRepeats > -1 ? $" (x{blas.SoundBlocks[0].NumberOfRepeats})" : "");
+			lblRepeat0.Text = "Repeats: " + blas.SoundBlocks[0].NumberOfRepeats;
+			if (blas.SoundBlocks[1].Data != null)
+			{
+				lblDuration1.Text = $"Duration: {Math.Round((decimal)blas.SoundBlocks[1].Data.Length / blas.Frequency, 2)}" + (blas.SoundBlocks[1].NumberOfRepeats > -1 ? $" (x{blas.SoundBlocks[1].NumberOfRepeats})" : "");
+				lblRepeat1.Text = "Repeats: " + blas.SoundBlocks[1].NumberOfRepeats.ToString();
+			}
+			lblSdb1.Visible = lblDuration1.Visible = lblRepeat1.Visible = blas.SoundBlocks[1].Data != null;
+		}
+
 		private void opnFile_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
 		{
 			try { _lfd = new LfdFile(opnFile.FileName); }
@@ -87,67 +156,27 @@ namespace Idmr.TieSoundEditor
 				if (_lfd.Rmap.SubHeaders[i].Type == Resource.ResourceType.Voic || _lfd.Rmap.SubHeaders[i].Type == Resource.ResourceType.Blas)
 					_lfd.Resources[i].Tag = lstVOIC.Items.Add(_lfd.Rmap.SubHeaders[i].Name);		// if valid source, add it to the lst
 		}
-		private void lstVOIC_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			txtWave.Enabled = true;
-			cmdWave.Enabled = true;
-			txtWave.Text = Directory.GetCurrentDirectory() + "\\" + lstVOIC.SelectedItem.ToString() + ".wav";
-			cmdSave.Enabled = true;
-			// play sound from memory as index changes for preview
-			MemoryStream mem = new MemoryStream();
-			vocToWav(mem);
-			byte[] soundBytes = new byte[mem.Length];
-			mem.Position = 0;
-			mem.Read(soundBytes, 0, (int)mem.Length);	//read it back into an array
-			PlaySound(soundBytes, IntPtr.Zero, SoundFlags.SND_MEMORY | SoundFlags.SND_ASYNC);
-			mem.Close();
 
-			Blas blas = _currentBlas;
-			lblFreq.Text = "Freq (Hz): " + blas.Frequency;
-			lblDuration0.Text = $"Duration: {Math.Round((decimal)blas.SoundBlocks[0].Data.Length / blas.Frequency, 2)}" + (blas.SoundBlocks[0].NumberOfRepeats > -1 ? $" (x{blas.SoundBlocks[0].NumberOfRepeats})" : "");
-			lblRepeat0.Text = "Repeats: " + blas.SoundBlocks[0].NumberOfRepeats;
-			if (blas.SoundBlocks[1].Data != null)
+		private void optExport_CheckedChanged(object sender, EventArgs e)
+		{
+			if (optExport.Checked)
 			{
-				lblDuration1.Text = $"Duration: {Math.Round((decimal)blas.SoundBlocks[1].Data.Length / blas.Frequency, 2)}" + (blas.SoundBlocks[1].NumberOfRepeats > -1 ? $" (x{blas.SoundBlocks[1].NumberOfRepeats})" : "");
-				lblRepeat1.Text = "Repeats: " + blas.SoundBlocks[1].NumberOfRepeats.ToString();
+				label1.Text = "Resource file (LFD) to extract sound from";
+				label3.Text = "Wave file to save as";
 			}
-			lblSdb1.Visible = lblDuration1.Visible = lblRepeat1.Visible = blas.SoundBlocks[1].Data != null;
+			else
+			{
+				label1.Text = "Resource file (LFD) to save sound in";
+				label3.Text = "Wave file to load (must match VOIC/BLAS name)";
+			}
 		}
+
 		private void savFile_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
 		{
 			cmdSave.Enabled = true;
 			txtWave.Text = savFile.FileName;
 		}
-		private void cmdSave_Click(object sender, EventArgs e)
-		{
-			if (optExport.Checked)
-			{
-				FileStream stream = null;
-				try
-				{
-					stream = File.OpenWrite(txtWave.Text);
-					stream.SetLength(1);	//resets file in case of overwrite
-					vocToWav(stream);
-					stream.Close();
-				}
-				catch (Exception x)
-				{
-					MessageBox.Show(x.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-					stream.Close();
-					return;
-				}
-			}
-			else
-			{
-				try
-				{
-					string name = Path.GetFileNameWithoutExtension(txtWave.Text);
-					if (lstVOIC.Items.IndexOf(name) == -1) throw new Exception("WAV file name must match an existing VOIC/BLAS to overwrite");
-					wavToVoc(lstVOIC.Items.IndexOf(name));
-				}
-				catch (Exception x) { MessageBox.Show(x.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
-			}
-		}
+		#endregion
 
 		private void vocToWav(Stream s)
 		{
@@ -218,30 +247,6 @@ namespace Idmr.TieSoundEditor
 			blas.Frequency = freq;
 			_lfd.Resources[index] = blas;
 			_lfd.Write();
-		}
-
-		private void optExport_CheckedChanged(object sender, EventArgs e)
-		{
-			if (optExport.Checked)
-			{
-				label1.Text = "Resource file (LFD) to extract sound from";
-				label3.Text = "Wave file to save as";
-			}
-			else
-			{
-				label1.Text = "Resource file (LFD) to save sound in";
-				label3.Text = "Wave file to load (must match VOIC/BLAS name)";
-			}
-		}
-		private void cmdExit_Click(object sender, EventArgs e) => Application.Exit();
-
-		private void cmdDump_Click(object sender, EventArgs e)
-		{
-			Blas blas = _currentBlas;
-			FileStream dump = File.OpenWrite(_lfd.FilePath + "_dump.txt");
-			new BinaryWriter(dump).Write(blas.RawData);
-			dump.SetLength(dump.Position);
-			dump.Close();
 		}
 
 		Blas _currentBlas
